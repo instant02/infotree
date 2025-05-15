@@ -6,7 +6,7 @@ import { crawl_contest } from './campus_contest.js';
 import { krcrawl } from './koreasch.js';
 
 export async function crawl() {
-  const number = 5; //크롤링 문서 개수
+  const number = 15; //크롤링 문서 개수
 
   const clubresult = await crawl_club(number);
   await saveAllPosts(clubresult);

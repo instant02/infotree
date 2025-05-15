@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:infotree/model/dummy/dummy_benefits.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:provider/provider.dart';
+
+import 'package:infotree/model/data.dart';
+import 'package:infotree/model/benefit_data.dart';
 import 'package:infotree/view/pages/search_page.dart';
-import 'package:infotree/view/pages/benefits_page.dart';
 import 'package:infotree/view/pages/category_page.dart';
+import 'package:infotree/view/pages/benefits_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -32,6 +37,42 @@ class _MainPageState extends State<MainPage> {
     '컴퓨터': Icons.computer,
     '디자인': Icons.design_services,
   };
+
+  List<BenefitData> popularBenefits = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPopularBenefits();
+  }
+
+  Future<void> fetchPopularBenefits() async {
+    try {
+      final userId = Provider.of<Data>(context, listen: false).user.id;
+      final url = Uri.parse(
+        'http://localhost:3000/demographic_recommend/$userId',
+      );
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final list =
+            (jsonData['recommended_benefits'] as List)
+                .map((e) => BenefitData.fromJson(e))
+                .toList();
+
+        setState(() {
+          popularBenefits = list;
+          isLoading = false;
+        });
+      } else {
+        print('서버 오류: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('오류 발생: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +106,6 @@ class _MainPageState extends State<MainPage> {
                 ),
               ),
             ),
-
-            const SizedBox(height: 20),
-
             const SizedBox(height: 20),
 
             // 📂 카테고리 제목
@@ -87,12 +125,13 @@ class _MainPageState extends State<MainPage> {
                 crossAxisSpacing: 30,
                 childAspectRatio: 1,
                 children:
-                    categories.map((entry) {
-                      return _buildCategoryItem(entry.key, entry.value);
-                    }).toList(),
+                    categories
+                        .map(
+                          (entry) => _buildCategoryItem(entry.key, entry.value),
+                        )
+                        .toList(),
               ),
             ),
-
             const SizedBox(height: 20),
 
             // 🔥 인기
@@ -102,71 +141,80 @@ class _MainPageState extends State<MainPage> {
             ),
             const SizedBox(height: 12),
 
-            // 🔥 인기 리스트
             SizedBox(
               height: 180,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: dummyBenefits.length,
-                itemBuilder: (context, index) {
-                  final noti = dummyBenefits[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => NotificationPage(notification: noti),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 140,
-                      margin: const EdgeInsets.only(right: 12),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black12, blurRadius: 4),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            noti.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            noti.description,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          const Spacer(),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.favorite,
-                                size: 16,
-                                color: Colors.red,
+              child:
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: popularBenefits.length,
+                        itemBuilder: (context, index) {
+                          final noti = popularBenefits[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) =>
+                                          NotificationPage(notification: noti),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 140,
+                              margin: const EdgeInsets.only(right: 12),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 4,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${noti.likes}',
-                                style: const TextStyle(fontSize: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    noti.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    noti.description,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  const Spacer(),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.favorite,
+                                        size: 16,
+                                        color: Colors.red,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${noti.likes}',
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ],
+                            ),
+                          );
+                        },
                       ),
-                    ),
-                  );
-                },
-              ),
             ),
           ],
         ),
@@ -174,7 +222,6 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // 카테고리 아이템
   Widget _buildCategoryItem(String label, IconData icon) {
     return GestureDetector(
       onTap: () {

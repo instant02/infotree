@@ -27,7 +27,7 @@ async function detailsite(link) {
 }
 
 export async function crawl_contest(num) {
-  const browser = await puppeteer.launch({ headless: 'new' });
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto('https://www.campuspick.com/contest', {
     waitUntil: 'networkidle2',

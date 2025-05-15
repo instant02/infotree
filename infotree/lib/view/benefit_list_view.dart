@@ -27,7 +27,7 @@ class BenefitListView extends StatelessWidget {
                   backgroundImage:
                       item.image != null
                           ? NetworkImage(item.image!)
-                          : const AssetImage('assets/default.jpg')
+                          : const AssetImage('assets/images/default.jpg')
                               as ImageProvider,
                 ),
                 title: Text(

@@ -11,7 +11,7 @@ export async function fetchsite() {
   const sitemapData = await parser.parseStringPromise(response.data);
   const urls = sitemapData.urlset.url.map((url) => url.loc[0]);
 
-  const lasturls = urls.slice(-39, -30); // 크롤링 개수 조절
+  const lasturls = urls.slice(-49, -40); // 크롤링 개수 조절
   const result = [];
 
   for (const url of lasturls) {

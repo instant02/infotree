@@ -22,7 +22,7 @@ const url =
 const params = {
   serviceKey: API_KEY,
   page: '1',
-  perPage: '10',
+  perPage: '20',
   returnType: 'JSON',
 };
 

@@ -3,6 +3,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { crawl } from './index.js';
+import fetch from 'node-fetch';
 
 const { Pool } = pg;
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -11,6 +12,8 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 app.set('port', process.env.PORT || 3000);
+
+const modelURL = 'http://localhost:8000';
 
 // PostgreSQL 연결 설정
 const pool = new Pool({
@@ -50,6 +53,87 @@ app.get('/users/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'DB error' });
+  }
+});
+
+app.get('/recommend/:user_id', async (req, res) => {
+  const userId = req.params.user_id;
+
+  try {
+    // 1. FastAPI 모델 서버에서 추천 결과 받아오기
+    const response = await fetch(`${modelURL}/recommendations/${userId}`);
+    const result = await response.json();
+    console.log(result);
+
+    if (
+      !result.recommended_benefits ||
+      result.recommended_benefits.length === 0
+    ) {
+      return res.status(404).json({ error: '추천 결과 없음' });
+    }
+
+    const benefitIds = result.recommended_benefits.map((item) => item.id);
+
+    // 2. PostgreSQL에서 혜택 정보 조회
+    const query = `
+      SELECT *
+      FROM benefits
+      WHERE id = ANY($1::int[])
+      ORDER BY POSITION(id::text IN $2)
+    `;
+
+    // PostgreSQL에선 배열 순서를 보장하지 않으므로, 순서를 문자열로 넘겨 POSITION으로 정렬 (optional)
+    const orderStr = benefitIds.join(',');
+
+    const dbResult = await pool.query(query, [benefitIds, orderStr]);
+
+    res.json({
+      user_id: userId,
+      recommended_benefits: dbResult.rows,
+    });
+  } catch (err) {
+    console.error('추천 오류:', err);
+    res.status(500).json({ error: '내부 서버 오류' });
+  }
+});
+
+// GET /demographic_recommend/:user_id
+app.get('/demographic_recommend/:user_id', async (req, res) => {
+  const userId = req.params.user_id;
+
+  try {
+    // 1. FastAPI 서버에서 추천 결과 가져오기
+    const response = await fetch(`${modelURL}/demographic_recommend/${userId}`);
+    const result = await response.json();
+
+    if (!result.recommendations || result.recommendations.length === 0) {
+      return res.status(404).json({ error: '추천 결과 없음' });
+    }
+
+    // 2. benefit_id만 추출
+    const benefitIds = result.recommendations.map((r) => r.benefit_id);
+
+    // 3. PostgreSQL에서 해당 혜택 정보 조회
+    const query = `
+      SELECT *
+      FROM benefits
+      WHERE id = ANY($1::int[])
+    `;
+    const dbResult = await pool.query(query, [benefitIds]);
+
+    // 선택적으로: 순서를 FastAPI 추천 순서대로 정렬
+    const benefitMap = new Map(dbResult.rows.map((b) => [b.id, b]));
+    const orderedBenefits = benefitIds
+      .map((id) => benefitMap.get(id))
+      .filter(Boolean);
+
+    res.json({
+      user_id: userId,
+      recommended_benefits: orderedBenefits,
+    });
+  } catch (err) {
+    console.error('Demographic 추천 오류:', err);
+    res.status(500).json({ error: '내부 서버 오류' });
   }
 });
 
