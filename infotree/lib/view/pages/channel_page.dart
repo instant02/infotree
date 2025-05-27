@@ -20,11 +20,20 @@ class _ChannelPageState extends State<ChannelPage> {
   String description = '';
   List<BenefitData> items = [];
   bool isLoading = true;
+  bool isSubscribed = false;
 
   @override
   void initState() {
     super.initState();
     _loadChannelData();
+    _checkSubscription();
+  }
+
+  void _checkSubscription() {
+    final userChannels = context.read<Data>().user.channel;
+    setState(() {
+      isSubscribed = userChannels.contains(widget.channelId);
+    });
   }
 
   Future<void> _loadChannelData() async {
@@ -59,6 +68,48 @@ class _ChannelPageState extends State<ChannelPage> {
     }
   }
 
+  Future<void> _subscribe() async {
+    final userId = context.read<Data>().user.id;
+    final url = Uri.parse(
+      'http://localhost:3000/channel/$userId/${widget.channelId}',
+    );
+
+    final res = await http.post(url);
+
+    if (res.statusCode == 200) {
+      setState(() => isSubscribed = true);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('구독이 완료되었습니다.')));
+      await context.read<Data>().fetchUserFromServer();
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('구독 실패: ${res.statusCode}')));
+    }
+  }
+
+  Future<void> _unsubscribe() async {
+    final userId = context.read<Data>().user.id;
+    final url = Uri.parse(
+      'http://localhost:3000/channel/$userId/${widget.channelId}',
+    );
+
+    final res = await http.delete(url);
+
+    if (res.statusCode == 200) {
+      setState(() => isSubscribed = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('구독이 취소되었습니다.')));
+      await context.read<Data>().fetchUserFromServer();
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('구독 취소 실패: ${res.statusCode}')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +124,6 @@ class _ChannelPageState extends State<ChannelPage> {
                       : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // ⬆️ Description + Padding
                           Padding(
                             padding: const EdgeInsets.fromLTRB(15, 5, 0, 5),
                             child: Text(
@@ -85,26 +135,21 @@ class _ChannelPageState extends State<ChannelPage> {
                               ),
                             ),
                           ),
-
                           const Divider(),
-
-                          // 📃 혜택 리스트
                           BenefitListView(items: items),
-
                           const SizedBox(height: 16),
-
-                          // ⬇️ 구독 취소 버튼
                           Center(
                             child: TextButton.icon(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('구독이 취소되었습니다.')),
-                                );
-                              },
-                              icon: const Icon(Icons.cancel, color: Colors.red),
-                              label: const Text(
-                                '구독 취소',
-                                style: TextStyle(color: Colors.red),
+                              icon: Icon(
+                                isSubscribed ? Icons.cancel : Icons.add,
+                                color: isSubscribed ? Colors.red : Colors.blue,
+                              ),
+                              label: Text(
+                                isSubscribed ? '구독 취소' : '구독하기',
+                                style: TextStyle(
+                                  color:
+                                      isSubscribed ? Colors.red : Colors.blue,
+                                ),
                               ),
                               style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
@@ -115,6 +160,8 @@ class _ChannelPageState extends State<ChannelPage> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
+                              onPressed:
+                                  isSubscribed ? _unsubscribe : _subscribe,
                             ),
                           ),
                         ],

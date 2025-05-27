@@ -4,6 +4,8 @@ import '../utils.dart';
 import 'package:infotree/model/benefit_data.dart';
 import 'package:infotree/model/user.dart';
 import 'package:infotree/model/data.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class NotificationPage extends StatefulWidget {
   final BenefitData notification;
@@ -23,6 +25,44 @@ class _NotificationPageState extends State<NotificationPage> {
     super.initState();
     likes = widget.notification.likes;
     liked = context.read<Data>().user.likes.contains(widget.notification.id);
+    context.read<Data>().fetchUserFromServer();
+    sendVisitLog(context, widget.notification.id);
+  }
+
+  Future<void> sendVisitLog(BuildContext context, int benefitId) async {
+    final userId = context.read<Data>().user.id;
+    final url = Uri.parse('http://localhost:3000/visit/$userId/$benefitId');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        print('Visit log sent successfully');
+      } else {
+        print('Failed to send visit log: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending visit log: $e');
+    }
+  }
+
+  Future<void> sendLike(bool isLike) async {
+    final userId = context.read<Data>().user.id;
+    final benefitId = widget.notification.id;
+    final url = Uri.parse(
+      'http://localhost:3000/${isLike ? 'like' : 'dislike'}/$userId/$benefitId',
+    );
+
+    try {
+      final response = await http.post(url);
+
+      if (response.statusCode == 200) {
+        print('${isLike ? '좋아요' : '좋아요 취소'} 성공');
+      } else {
+        print('서버 오류: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('네트워크 오류: $e');
+    }
   }
 
   void toggleLike() {
@@ -30,6 +70,8 @@ class _NotificationPageState extends State<NotificationPage> {
       liked = !liked;
       likes += liked ? 1 : -1;
     });
+
+    sendLike(liked);
   }
 
   @override

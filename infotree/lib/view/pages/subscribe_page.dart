@@ -31,6 +31,7 @@ class _SubscribePageState extends State<SubscribePage> {
   void initState() {
     super.initState();
     _loadFilters();
+    context.read<Data>().fetchUserFromServer();
   }
 
   Future<void> _loadFilters() async {

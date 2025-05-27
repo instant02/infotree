@@ -1,0 +1,229 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+body {
+  font-family: 'Roboto', sans-serif;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #f5f7fa;
+  color: #333;
+}
+
+h1 {
+  border-bottom: 3px solid #005f99;
+  padding-bottom: 12px;
+  margin-bottom: 30px;
+  color: #004a80;
+  font-weight: 700;
+  font-size: 2.2rem;
+}
+
+.container {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.left,
+.right {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 95, 153, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  padding: 32px;
+}
+
+.left {
+  flex: 2 1 600px;
+}
+
+.right {
+  flex: 1 1 350px;
+  max-width: 400px;
+  height: fit-content;
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  color: #007acc;
+  margin-bottom: 8px;
+  margin-top: 20px;
+  font-size: 1rem;
+}
+
+input[type='text'],
+textarea,
+input[type='date'] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1.5px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.25s ease;
+  font-family: inherit;
+}
+
+input[type='text']:focus,
+textarea:focus,
+input[type='date']:focus {
+  outline: none;
+  border-color: #005f99;
+  box-shadow: 0 0 6px rgba(0, 95, 153, 0.3);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+button {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 14px 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  box-shadow: 0 4px 8px rgba(0, 95, 153, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #005f99;
+}
+
+/* 가입 유저 리스트 */
+.user-list {
+  max-height: 130px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fafafa;
+  font-size: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.user-list span {
+  padding: 8px 14px;
+  background: #007acc;
+  color: #fff;
+  border-radius: 20px;
+  font-weight: 500;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0, 95, 153, 0.3);
+  transition: background-color 0.25s ease;
+  cursor: default;
+}
+
+.user-list span:hover {
+  background-color: #005f99;
+}
+
+/* 혜택 테이블 */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 14px;
+  font-size: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 95, 153, 0.1), 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+caption {
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  color: #007acc;
+  text-align: left;
+}
+
+thead tr {
+  background: #007acc;
+  color: white;
+  font-weight: 700;
+}
+
+th,
+td {
+  padding: 14px 16px;
+  text-align: left;
+}
+
+tbody tr {
+  background: #fafafa;
+  border-radius: 8px;
+  box-shadow: inset 0 -1px 0 #e3eaf3;
+  transition: background-color 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #e1f0ff;
+}
+
+tbody tr td:first-child {
+  font-weight: 600;
+  color: #004a80;
+}
+
+/* 카테고리 체크박스 리스트 */
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  background: #e7f0fc;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-weight: 600;
+  color: #005f99;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.category-item:hover {
+  background-color: #c0dafd;
+}
+
+.category-item input[type='checkbox'] {
+  margin-right: 8px;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+/* 카테고리 가중치 그래프 */
+.category-bar {
+  margin-bottom: 12px;
+}
+.category-label {
+  font-weight: 700;
+  color: #005f99;
+  margin-bottom: 4px;
+}
+.bar-container {
+  background: #ddd;
+  border-radius: 8px;
+  height: 18px;
+  width: 100%;
+}
+.bar-fill {
+  background: #007acc;
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.5s ease;
+}

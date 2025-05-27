@@ -41,6 +41,10 @@ CREATE TABLE logs (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- 생성 시각 (기본 현재시간)
 );
 
+ALTER TABLE logs
+ADD CONSTRAINT logs_user_benefit_unique UNIQUE(user_id, benefit_id);
+
+
 CREATE TABLE channels (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
