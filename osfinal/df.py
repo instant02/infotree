@@ -7,6 +7,60 @@ from datetime import datetime
 
 engine = create_engine('postgresql+psycopg2://infotree:info1234@localhost:5432/infotree')
 
+def get_df_score(user_id):
+
+    user_row = pd.read_sql(f"""
+        SELECT gender, year
+        FROM users
+        WHERE id = {user_id}
+    """, engine)
+
+    if user_row.empty:
+        return {}
+
+    gender = user_row.at[0, 'gender']
+    year = user_row.at[0, 'year']
+
+    now = datetime.now().year
+    age = now - year
+
+    similar_users = pd.read_sql(f"""
+        SELECT id
+        FROM users
+        WHERE gender = '{gender}' AND ({now} - year) = {age}
+    """, engine)
+
+    if similar_users.empty:
+        return {}
+
+    user_ids_list = similar_users['id'].tolist()
+    user_ids_str = ', '.join(str(uid) for uid in user_ids_list)
+
+    logs_df = pd.read_sql(f"""
+        SELECT user_id, benefit_id, 0.5 AS rating
+        FROM logs
+        WHERE user_id IN ({user_ids_str})
+        AND benefit_id IN (
+          SELECT id FROM benefits
+          WHERE start_date <= NOW() AND end_date >= NOW() AND private = FALSE
+        )
+     """, engine)
+
+    likes_df = pd.read_sql(f"""
+    SELECT u.id AS user_id, unnest(u.likes) AS benefit_id
+    FROM users u
+    WHERE u.id IN ({user_ids_str})
+    """, engine)
+
+    likes_df['rating'] = 1
+
+    combined_df = pd.concat([logs_df, likes_df], ignore_index=True)
+    combined_df = combined_df.groupby(['benefit_id'], as_index=False)['rating'].mean()
+
+    return dict(zip(combined_df['benefit_id'], combined_df['rating']))
+
+
+"""
 def map_age(year):
     now = datetime.now().year
     age = now - year
@@ -136,3 +190,4 @@ def inference_multi_channel(user_id, top_k=5):
 def get_df_score(user_id):
     recs = inference_multi_channel(user_id, top_k=10)
     return {rec["benefit_id"]: rec["predicted_rating"] for rec in recs}
+"""
