@@ -60,7 +60,7 @@ def get_df_score(user_id):
     return dict(zip(combined_df['benefit_id'], combined_df['rating']))
 
 
-"""
+
 def map_age(year):
     now = datetime.now().year
     age = now - year
@@ -190,4 +190,4 @@ def inference_multi_channel(user_id, top_k=5):
 def get_df_score(user_id):
     recs = inference_multi_channel(user_id, top_k=10)
     return {rec["benefit_id"]: rec["predicted_rating"] for rec in recs}
-"""
+

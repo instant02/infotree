@@ -3,11 +3,12 @@ from hybrid import hybrid_recommend
 from sqlalchemy import create_engine
 import pandas as pd
 import traceback
+import df
 
 
 app = FastAPI()
 
-engine = create_engine('postgresql+psycopg2://postgres:oyun1211@localhost:5433/infotree')
+engine = create_engine('postgresql+psycopg2://postgres:oyun1211@localhost:5432/infotree')
 
 @app.get("/recommend/{user_id}")
 def recommend(user_id: int):
