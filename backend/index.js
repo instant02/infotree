@@ -8,9 +8,9 @@ import { crawl_dgujanghak } from './dgujanghak.js';
 import { crawl_dgunotice } from './dgunotice.js';
 
 export async function crawl() {
-  const number = 5; //크롤링 문서 개수
-  const pagenum = 2; //동국대학교 크롤링 페이지 개수
-  
+  const number = 30; //크롤링 문서 개수
+  const pagenum = 0; //동국대학교 크롤링 페이지 개수
+
   const clubresult = await crawl_club(number);
   await saveAllPosts(clubresult, 0, false);
   //캠퍼스픽_동아리
@@ -24,11 +24,11 @@ export async function crawl() {
   //캠퍼스픽_공모전
   const dgujanghak = await crawl_dgujanghak(pagenum);
   await saveAllPosts(dgujanghak, 3, true);
-  //동국대학교 장학공지  
+  //동국대학교 장학공지
 
   const dgugen = await crawl_dgunotice(pagenum);
   await saveAllPosts(dgugen, 3, true);
-  //동국대학교 일반공지  
+  //동국대학교 일반공지
 
   const linkresult = await fetchsite(number);
   await saveAllPosts(linkresult, 0, false);

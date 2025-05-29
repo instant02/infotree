@@ -37,6 +37,16 @@ VALUES (
   ARRAY[1]
 );
 
+INSERT INTO channels (id, name, description,  flowers, benefit_id, users)
+VALUES (
+  3,
+  'DGU',
+  '동국대학교 공지사항입니다',
+  24,
+  ARRAY[]::INTEGER[],
+  ARRAY[]::INTEGER[]
+);
+
 -- BENEFITS
 INSERT INTO benefits (
   id, title, start_date, end_date, description,

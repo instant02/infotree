@@ -92,6 +92,24 @@
         flex-direction: column;
         align-items: center;
       }
+      #latitude,
+      #longitude {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1.5px solid #ccc;
+        font-size: 1rem;
+        font-family: inherit;
+        margin-bottom: 15px;
+        transition: border-color 0.25s ease;
+      }
+
+      #latitude:focus,
+      #longitude:focus {
+        border-color: #005f99;
+        outline: none;
+        box-shadow: 0 0 6px rgba(0, 95, 153, 0.3);
+      }
       .sidebar h2 {
         font-size: 3rem;
         font-weight: 900;
@@ -356,6 +374,24 @@
 
           <label for="end_date">종료일</label>
           <input type="date" id="end_date" name="end_date" required />
+
+          <label for="latitude">위도 (Latitude)</label>
+          <input
+            type="number"
+            id="latitude"
+            name="latitude"
+            step="any"
+            placeholder="예: 37.5665"
+          />
+
+          <label for="longitude">경도 (Longitude)</label>
+          <input
+            type="number"
+            id="longitude"
+            name="longitude"
+            step="any"
+            placeholder="예: 126.9788"
+          />
 
           <label for="link">링크 (URL)</label>
           <input

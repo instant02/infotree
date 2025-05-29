@@ -31,6 +31,8 @@ class BenefitData {
     this.likes = 0,
   });
 
+  
+
   factory BenefitData.fromJson(Map<String, dynamic> json) {
     return BenefitData(
       id: json['id'] ?? 0,
