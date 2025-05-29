@@ -10,7 +10,7 @@ const pool = new Pool({
 });
 
 // 저장 함수
-export async function savePostToBenefits(post) {
+export async function savePostToBenefits(post, id, priv) {
   const query = `
       INSERT INTO benefits (
     title, start_date, end_date, description,
@@ -31,9 +31,9 @@ export async function savePostToBenefits(post) {
     startDate,
     post.end_date && post.end_date !== '' ? post.end_date : post.start_date,
     post.description,
-    false, // private
+    priv, // private
     post.categories,
-    0, // channel_id
+    id, // channel_id
     post.image || null,
     post.link || null,
     null, // latitude
@@ -49,8 +49,8 @@ export async function savePostToBenefits(post) {
 }
 
 // 전체 저장 처리
-export async function saveAllPosts(posts) {
+export async function saveAllPosts(posts, id, priv) {
   for (const post of posts) {
-    await savePostToBenefits(post);
+    await savePostToBenefits(post, id, priv);
   }
 }
