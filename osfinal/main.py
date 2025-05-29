@@ -33,6 +33,16 @@ def recommend(user_id: int):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
     
+@app.get("/demographic_recommend/{user_id}")
+def demographic_recommend(user_id: int, top_k: int=5):
+    print(user_id)
+    recommendations = df.inference_multi_channel(user_id, top_k=top_k)
+
+    return {
+        "user_id": user_id,
+        "top_k": top_k,
+        "recommendations": recommendations
+    }
     
     """
 from fastapi import FastAPI, HTTPException
@@ -70,15 +80,4 @@ def recommend(user_id: int):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.get("/demographic_recommend/{user_id}")
-def demographic_recommend(user_id: int, top_k: int=5):
-    print(user_id)
-    recommendations = df.inference_multi_channel(user_id, top_k=top_k)
-
-    return {
-        "user_id": user_id,
-        "top_k": top_k,
-        "recommendations": recommendations
-    }
     """
