@@ -3,7 +3,7 @@ import { load } from 'cheerio';
 import xml2js from 'xml2js';
 import { classifyText } from './llm.js';
 
-export async function fetchsite() {
+export async function fetchsite(number) {
   const response = await axios.get(
     'https://linkareer.com/sitemap/activities/114.xml'
   );
@@ -11,7 +11,7 @@ export async function fetchsite() {
   const sitemapData = await parser.parseStringPromise(response.data);
   const urls = sitemapData.urlset.url.map((url) => url.loc[0]);
 
-  const lasturls = urls.slice(-49, -40); // 크롤링 개수 조절
+  const lasturls = urls.slice(-49, -49 + number); // 크롤링 개수 조절
   const result = [];
 
   for (const url of lasturls) {
