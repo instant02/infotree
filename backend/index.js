@@ -34,6 +34,6 @@ export async function crawl() {
   await saveAllPosts(linkresult);
   //링커리어
 
-  await krcrawl();
+  await krcrawl(number);
   //한국장학재단 공공데이터
 }
