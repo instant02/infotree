@@ -30,7 +30,7 @@ export async function crawl() {
   await saveAllPosts(dgugen);
   //동국대학교 일반공지  
 
-  const linkresult = await fetchsite();
+  const linkresult = await fetchsite(number);
   await saveAllPosts(linkresult);
   //링커리어
 
