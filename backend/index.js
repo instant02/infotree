@@ -12,26 +12,26 @@ export async function crawl() {
   const pagenum = 2; //동국대학교 크롤링 페이지 개수
   
   const clubresult = await crawl_club(number);
-  await saveAllPosts(clubresult);
+  await saveAllPosts(clubresult, 0, false);
   //캠퍼스픽_동아리
 
   const activityresult = await crawl_activity(number);
-  await saveAllPosts(activityresult);
+  await saveAllPosts(activityresult, 0, false);
   //캠퍼스픽_대외활동
 
   const contestresult = await crawl_contest(number);
-  await saveAllPosts(contestresult);
+  await saveAllPosts(contestresult, 0, false);
   //캠퍼스픽_공모전
   const dgujanghak = await crawl_dgujanghak(pagenum);
-  await saveAllPosts(dgujanghak);
+  await saveAllPosts(dgujanghak, 3, true);
   //동국대학교 장학공지  
 
   const dgugen = await crawl_dgunotice(pagenum);
-  await saveAllPosts(dgugen);
+  await saveAllPosts(dgugen, 3, true);
   //동국대학교 일반공지  
 
   const linkresult = await fetchsite(number);
-  await saveAllPosts(linkresult);
+  await saveAllPosts(linkresult, 0, false);
   //링커리어
 
   await krcrawl(number);
