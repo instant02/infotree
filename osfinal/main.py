@@ -22,7 +22,7 @@ def recommend(user_id: int):
 
         total_users = pd.read_sql("SELECT COUNT(*) FROM users", engine).iloc[0, 0]
 
-        results = hybrid2_recommend(user_id, n_likes, total_users)
+        results = hybrid_recommend(user_id, n_likes, total_users)
         recommendations = list(results.keys())[:10]
 
         return {
