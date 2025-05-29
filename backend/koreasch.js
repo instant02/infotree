@@ -18,15 +18,16 @@ const url =
   'https://api.odcloud.kr/api/15028252/v1/uddi:c7637c78-fbdd-481d-a59d-c6c12ce51a13';
 //명세서 url
 
-// API 요청 파라미터 설정
+
+
+async function getScholarships(number) {
+  // API 요청 파라미터 설정
 const params = {
   serviceKey: API_KEY,
   page: '1',
-  perPage: '20',
+  perPage: String(number),
   returnType: 'JSON',
 };
-
-async function getScholarships() {
   try {
     const response = await axios.get(url, { params });
     return response.data.data;
@@ -78,7 +79,7 @@ async function saveAllPosts(posts) {
   }
 }
 
-export async function krcrawl() {
-  const data = await getScholarships();
+export async function krcrawl(number) {
+  const data = await getScholarships(number);
   await saveAllPosts(data);
 }
