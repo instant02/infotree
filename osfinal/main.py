@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from hybrid3 import hybrid_recommend
+from hybrid import hybrid_recommend
 from sqlalchemy import create_engine
 import pandas as pd
 import traceback
