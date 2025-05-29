@@ -4,10 +4,13 @@ import { crawl_club } from './campus_club.js';
 import { crawl_activity } from './campus_activity.js';
 import { crawl_contest } from './campus_contest.js';
 import { krcrawl } from './koreasch.js';
+import { crawl_dgujanghak } from './dgujanghak.js';
+import { crawl_dgunotice } from './dgunotice.js';
 
 export async function crawl() {
-  const number = 15; //크롤링 문서 개수
-
+  const number = 5; //크롤링 문서 개수
+  const pagenum = 2; //동국대학교 크롤링 페이지 개수
+  
   const clubresult = await crawl_club(number);
   await saveAllPosts(clubresult);
   //캠퍼스픽_동아리
@@ -19,6 +22,13 @@ export async function crawl() {
   const contestresult = await crawl_contest(number);
   await saveAllPosts(contestresult);
   //캠퍼스픽_공모전
+  const dgujanghak = await crawl_dgujanghak(pagenum);
+  await saveAllPosts(dgujanghak);
+  //동국대학교 장학공지  
+
+  const dgugen = await crawl_dgunotice(pagenum);
+  await saveAllPosts(dgugen);
+  //동국대학교 일반공지  
 
   const linkresult = await fetchsite();
   await saveAllPosts(linkresult);
