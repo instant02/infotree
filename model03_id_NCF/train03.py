@@ -22,7 +22,7 @@ WANDB_KEY = 'wandb_key.txt'
 TRAIN_CSV_PATH = "data03/rating_train.csv"
 VAL_CSV_PATH = "data03/rating_test.csv"
 
-RUN_NAME = f'hihi'
+RUN_NAME = f'model03_{BATCH_SIZE}Batch_{EPOCHS}Epoch_{BATCH_SIZE}Batch_LR{LEARNING_RATE}'
 
 def train_model_from_sql(epochs=10, lr=1e-3, batch_size=64):
     
