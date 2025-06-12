@@ -257,7 +257,7 @@
     </style>
   </head>
   <body>
-    <h1>관리자 페이지 - <%= channel.name %></h1>
+    <h1><%= channel.name %></h1>
 
     <div class="container">
       <!-- 왼쪽 사이드바: 오늘똑 타이틀 + 카테고리 통계 -->
@@ -374,24 +374,6 @@
 
           <label for="end_date">종료일</label>
           <input type="date" id="end_date" name="end_date" required />
-
-          <label for="latitude">위도 (Latitude)</label>
-          <input
-            type="number"
-            id="latitude"
-            name="latitude"
-            step="any"
-            placeholder="예: 37.5665"
-          />
-
-          <label for="longitude">경도 (Longitude)</label>
-          <input
-            type="number"
-            id="longitude"
-            name="longitude"
-            step="any"
-            placeholder="예: 126.9788"
-          />
 
           <label for="link">링크 (URL)</label>
           <input

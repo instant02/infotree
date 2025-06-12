@@ -36,7 +36,7 @@ CREATE TABLE benefits (
 
 CREATE TABLE logs (
   id SERIAL PRIMARY KEY,           -- 로그 고유 ID (자동 증가)
-  user_id INTEGER NOT NULL,        -- 로그를 생성한 사용자 ID
+  user_id INTEGER NOT NULL,        -- 로그를 생성한 Admin ID
   benefit_id INTEGER NOT NULL,     -- 관련된 혜택(Benefit) ID
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- 생성 시각 (기본 현재시간)
 );

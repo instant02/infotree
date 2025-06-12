@@ -54,11 +54,12 @@ app.get('/admin/:channelid', async (req, res) => {
 
     // 2) 가입 유저 목록
     let users = [];
-    if (channel.users && channel.users.length > 0) {
-      const userResult = await pool.query(
-        'SELECT id, name, likes FROM users WHERE id = ANY($1::int[]) ORDER BY name',
-        [channel.users]
-      );
+    const userResult = await pool.query(
+      'SELECT id, name, likes FROM users WHERE $1 = ANY(channel) ORDER BY name',
+      [channelId]
+    );
+
+    if (userResult.rows.length > 0) {
       users = userResult.rows;
     }
 
@@ -123,9 +124,18 @@ app.get('/admin/:channelid', async (req, res) => {
 });
 
 app.post('/benefits/create', async (req, res) => {
-  let { title, description, start_date, end_date, category, channel_id } =
-    req.body;
+  let {
+    title,
+    description,
+    start_date,
+    end_date,
+    category,
+    channel_id,
+    image,
+    link,
+  } = req.body;
 
+  // 필수 항목 체크
   if (
     !title ||
     !description ||
@@ -137,6 +147,7 @@ app.post('/benefits/create', async (req, res) => {
     return res.status(400).send('필수 항목이 누락되었습니다.');
   }
 
+  // category가 배열이 아닐 경우 배열로 변환
   if (!Array.isArray(category)) {
     category = [category]; // 체크박스 1개 선택 시 문자열로 옴
   }
@@ -144,23 +155,30 @@ app.post('/benefits/create', async (req, res) => {
   // 중복 제거 (선택사항)
   category = [...new Set(category)];
 
+  // 이미지와 링크가 없을 경우 NULL로 설정
+  image = image || null;
+  link = link || null;
+
   try {
     const query = `
       INSERT INTO benefits
-      (title, description, start_date, end_date, categories, channel_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      (title, description, start_date, end_date, categories, channel_id, image, link)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id
     `;
 
-    await pool.query(query, [
+    const result = await pool.query(query, [
       title,
       description,
       start_date,
       end_date,
       category,
       channel_id,
+      image,
+      link,
     ]);
 
+    // 혜택이 정상적으로 등록된 후 리디렉션
     res.redirect(`/admin/${channel_id}`);
   } catch (err) {
     console.error(err);

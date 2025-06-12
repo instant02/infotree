@@ -16,7 +16,7 @@ class ChannelListView extends StatelessWidget {
           final channel = channels[index];
 
           return ListTile(
-            leading: CircleAvatar(radius: 24, backgroundColor: Colors.grey),
+            leading: CircleAvatar(radius: 24, backgroundColor: Colors.white),
             title: Text(
               channel.name,
               style: const TextStyle(fontWeight: FontWeight.bold),

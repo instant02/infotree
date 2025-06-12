@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => Data(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: appTheme,
         title: 'Flutter Route Demo',
         initialRoute: '/root',
