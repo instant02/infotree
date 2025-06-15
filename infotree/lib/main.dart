@@ -4,6 +4,7 @@ import 'view/pages/root_page.dart';
 import 'package:provider/provider.dart';
 import 'view/pages/subscribe_page.dart';
 import 'package:infotree/model/data.dart';
+import 'view/pages/login_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/subscribe': (context) => SubscribePage(),
           '/root': (context) => RootPage(),
+          '/login': (context) => LoginScreen(),
         },
       ),
     );
