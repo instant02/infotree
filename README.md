@@ -84,7 +84,7 @@ Infotree는 다음과 같은 가치를 제공합니다:
 | **데이터베이스** | PostgreSQL |
 | **크롤러** | Cheerio, Puppeteer, GPT-3.5 API |
 | **추천 시스템** | PyTorch (NCF), FastAPI |
-| **지도 기능** | flutter_map, Leaflet 기반 지도 API |
+| **지도 기능** | flutter_map
 
 ---
 
