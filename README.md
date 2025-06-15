@@ -92,9 +92,9 @@ Infotree는 다음과 같은 가치를 제공합니다:
 
 ![제공자](./assets/1.png)
 
-![유저](./assets/2.png)
+![유저](./assets/4.png)
 
-![하이브리드 모델](./assets/3.png)
+![하이브리드 모델](./assets/2.png)
 
 yaml
 복사
