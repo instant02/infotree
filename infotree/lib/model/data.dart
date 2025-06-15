@@ -36,7 +36,7 @@ class Data extends ChangeNotifier {
   Map<int, List<BenefitData>> benefitGroups = {};
 
   Future<void> fetchUserFromServer() async {
-    final uri = Uri.parse('http://localhost:3000/users/1'); // 주소 수정 가능
+    final uri = Uri.parse('http://localhost:3000/users/${user.id}'); // 주소 수정 가능
 
     try {
       final res = await http.get(uri);

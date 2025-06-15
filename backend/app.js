@@ -133,6 +133,8 @@ app.post('/benefits/create', async (req, res) => {
     channel_id,
     image,
     link,
+    latitude,
+    longitude,
   } = req.body;
 
   // 필수 항목 체크
@@ -147,23 +149,27 @@ app.post('/benefits/create', async (req, res) => {
     return res.status(400).send('필수 항목이 누락되었습니다.');
   }
 
-  // category가 배열이 아닐 경우 배열로 변환
+  // category를 배열로 변환
   if (!Array.isArray(category)) {
-    category = [category]; // 체크박스 1개 선택 시 문자열로 옴
+    category = [category];
   }
-
-  // 중복 제거 (선택사항)
   category = [...new Set(category)];
 
-  // 이미지와 링크가 없을 경우 NULL로 설정
+  // 옵션 항목 처리
   image = image || null;
   link = link || null;
+
+  // 위치정보: 숫자로 파싱, 없으면 null
+  latitude =
+    latitude !== undefined && latitude !== '' ? parseFloat(latitude) : null;
+  longitude =
+    longitude !== undefined && longitude !== '' ? parseFloat(longitude) : null;
 
   try {
     const query = `
       INSERT INTO benefits
-      (title, description, start_date, end_date, categories, channel_id, image, link)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      (title, description, start_date, end_date, categories, channel_id, image, link, latitude, longitude)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING id
     `;
 
@@ -176,9 +182,10 @@ app.post('/benefits/create', async (req, res) => {
       channel_id,
       image,
       link,
+      latitude,
+      longitude,
     ]);
 
-    // 혜택이 정상적으로 등록된 후 리디렉션
     res.redirect(`/admin/${channel_id}`);
   } catch (err) {
     console.error(err);
@@ -237,6 +244,58 @@ app.get('/users/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'DB error' });
+  }
+});
+
+app.post('/signup', async (req, res) => {
+  const { email, name, phone, school, major, categories } = req.body;
+
+  if (!email || !name || !phone || !school || !major || !categories) {
+    return res.status(400).json({ error: '모든 항목을 입력해 주세요.' });
+  }
+
+  try {
+    // 이메일 중복 확인
+    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [
+      email,
+    ]);
+    if (existing.rows.length > 0) {
+      return res.status(409).json({ error: '이미 가입된 이메일입니다.' });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO users (name, school, email, phone, major, categories, year, grade, gender, channel)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING *`,
+      [name, school, email, phone, major, [], 2002, 3, '남자', [0]]
+    );
+
+    res.status(201).json({ message: '회원가입 성공', user: result.rows[0] });
+  } catch (err) {
+    console.error('회원가입 오류:', err);
+    res.status(500).json({ error: '서버 오류' });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: '이메일이 필요합니다.' });
+  }
+
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [
+      email,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: '가입된 사용자가 아닙니다.' });
+    }
+
+    res.json({ message: '로그인 성공', user: result.rows[0] });
+  } catch (err) {
+    console.error('로그인 오류:', err);
+    res.status(500).json({ error: '서버 오류' });
   }
 });
 
@@ -710,5 +769,61 @@ app.get('/visit/:user_id/:benefit_id', async (req, res) => {
   } catch (err) {
     console.error('로그 추가 오류:', err);
     res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+  }
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.get('/', (req, res) => {
+  res.render('login');
+});
+
+// 로그인 처리
+app.post('/channel_login', async (req, res) => {
+  const channelId = parseInt(req.body.channel_id, 10);
+
+  if (!channelId) {
+    return res.status(400).json({ error: '채널 ID가 필요합니다.' });
+  }
+  console.log(channelId);
+  try {
+    const result = await pool.query('SELECT id FROM channels WHERE id = $1', [
+      channelId,
+    ]);
+
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ error: '해당 ID의 채널이 존재하지 않습니다.' });
+    }
+
+    res.redirect(`/admin/${channelId}`);
+  } catch (err) {
+    console.error('채널 로그인 오류:', err);
+    res.status(500).json({ error: '서버 오류 발생' });
+  }
+});
+
+app.post('/channel/create', async (req, res) => {
+  const { name, description } = req.body;
+
+  if (!name || !description) {
+    return res.status(400).json({ error: '채널 이름과 설명은 필수입니다.' });
+  }
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO channels (name, description, flowers, benefit_id, users)
+       VALUES ($1, $2, 0, '{}', '{}')
+       RETURNING id`,
+      [name, description]
+    );
+
+    res.status(200).json({ id: result.rows[0].id });
+  } catch (err) {
+    console.error('채널 생성 오류:', err);
+    res.status(500).json({ error: '서버 오류 발생' });
   }
 });

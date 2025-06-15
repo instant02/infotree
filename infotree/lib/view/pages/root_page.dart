@@ -28,12 +28,15 @@ class _RootPageState extends State<RootPage> {
   void initState() {
     super.initState();
     Provider.of<Data>(context, listen: false).fetchUserFromServer();
-    //mainUser = Provider.of<Data>(context, listen: false).user;
+    print("--");
+    print(Provider.of<Data>(context, listen: false).user.id);
+    mainUser = Provider.of<Data>(context, listen: false).user;
   }
 
   @override
   Widget build(BuildContext context) {
     mainUser = Provider.of<Data>(context, listen: false).user.copyWith();
+    print(mainUser.id);
 
     final List<Widget> pages = [
       SubscribePage(), // 첫 페이지는 즐겨찾기

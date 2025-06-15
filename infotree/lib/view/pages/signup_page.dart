@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:infotree/model/user_data.dart';
+import 'root_page.dart';
+import 'package:provider/provider.dart';
+import 'package:infotree/model/data.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -31,27 +37,65 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      final name = _nameController.text;
-      final school = _schoolController.text;
-      final email = _emailController.text;
-      final phone = _phoneController.text;
+      final name = _nameController.text.trim();
+      final school = _schoolController.text.trim();
+      final email = _emailController.text.trim();
+      final phone = _phoneController.text.trim();
       final majors =
-          _majorController.text.split(',').map((e) => e.trim()).toList();
-      final password = _passwordController.text;
+          _majorController.text
+              .split(',')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
+      final password = _passwordController.text.trim();
 
-      debugPrint('이름: $name');
-      debugPrint('학교: $school');
-      debugPrint('이메일: $email');
-      debugPrint('전화번호: $phone');
-      debugPrint('전공: $majors');
-      debugPrint('비밀번호: $password');
+      final categories = <String>['임시', '카테고리']; // 기본 키워드 (추후 변경 가능)
 
-      // 가입 정보 유효성 검증 통과 후
-      Navigator.pushNamed(context, '/select_keywords');
+      final body = {
+        'name': name,
+        'school': school,
+        'email': email,
+        'phone': phone,
+        'major': majors,
+        'categories': categories,
+      };
 
-      // TODO: 서버 전송 or DB 저장
+      try {
+        final res = await http.post(
+          Uri.parse('http://localhost:3000/signup'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(body),
+        );
+
+        if (res.statusCode == 201) {
+          final userJson = jsonDecode(res.body)['user'];
+          final userData = UserData.fromJson(userJson);
+
+          // ✅ Provider에 등록
+          Provider.of<Data>(context, listen: false).user = userData;
+
+          // ✅ RootPage 이동
+          if (!mounted) return;
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const RootPage()),
+            (route) => false,
+          );
+        } else {
+          final msg = jsonDecode(res.body)['error'] ?? '회원가입 실패';
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(msg)));
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('서버 연결 실패')));
+      }
     }
   }
 

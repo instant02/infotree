@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: appTheme,
         title: 'Flutter Route Demo',
-        initialRoute: '/root',
+        initialRoute: '/login',
         routes: {
           '/subscribe': (context) => SubscribePage(),
           '/root': (context) => RootPage(),

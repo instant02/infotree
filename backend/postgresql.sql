@@ -53,3 +53,6 @@ CREATE TABLE channels (
   benefit_id INTEGER[] DEFAULT '{}',
   users INTEGER[] DEFAULT '{}'
 );
+
+SELECT pg_get_serial_sequence('channels', 'id');
+SELECT setval('channels_id_seq', (SELECT MAX(id) FROM channels));
